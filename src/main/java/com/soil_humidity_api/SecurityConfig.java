@@ -1,4 +1,4 @@
-package com.soil_hunidity_api;
+package com.soil_humidity_api;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

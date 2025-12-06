@@ -1,4 +1,4 @@
-package com.soil_hunidity_api;
+package com.soil_humidity_api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
