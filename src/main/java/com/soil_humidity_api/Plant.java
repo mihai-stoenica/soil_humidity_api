@@ -5,7 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 @Entity
 public class Plant {
@@ -24,9 +26,4 @@ public class Plant {
         this.humidity = humidity;
     }
 
-    public void setId(Long id) { this.id = id; }
-
-    public void setName(String name) { this.name = name; }
-
-    public void setHumidity(int humidity) { this.humidity = humidity; }
 }
