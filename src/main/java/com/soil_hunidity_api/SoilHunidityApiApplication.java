@@ -1,0 +1,13 @@
+package com.soil_hunidity_api;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SoilHunidityApiApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SoilHunidityApiApplication.class, args);
+	}
+
+}
