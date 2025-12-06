@@ -1,5 +1,7 @@
-package com.soil_humidity_api;
+package com.soil_humidity_api.controller;
 
+import com.soil_humidity_api.entity.Plant;
+import com.soil_humidity_api.repository.PlantRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

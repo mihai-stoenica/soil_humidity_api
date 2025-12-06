@@ -1,4 +1,4 @@
-package com.soil_humidity_api;
+package com.soil_humidity_api.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
