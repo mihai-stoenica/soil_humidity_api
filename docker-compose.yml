@@ -10,7 +10,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: mysql:8.1
@@ -25,6 +26,11 @@ services:
       - "3306:3306"
     volumes:
       - db-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
 volumes:
   db-data:
