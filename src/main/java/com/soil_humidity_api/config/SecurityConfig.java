@@ -27,7 +27,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, JwtCookieFilter jwtCookieFilter, ApiKeyFilter apiKeyFilter) {
 
         http
-                .cors(Customizer.withDefaults())
+                //.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()
                 )
