@@ -29,7 +29,7 @@ public class SoilSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, @NonNull CloseStatus status) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, @NonNull CloseStatus status) {
 
         String query = session.getUri().getQuery();
         String apiKey = extractApiKey(query);

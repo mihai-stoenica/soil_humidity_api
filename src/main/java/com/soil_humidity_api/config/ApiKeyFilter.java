@@ -27,6 +27,12 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+        if (path.startsWith("/ws/")) {
+            filterChain.doFilter(request, response);
+            return; // skip filter for WebSocket handshake
+        }
+
         String apiKey = request.getHeader("X-API-KEY");
 
         if (apiKey == null) {
