@@ -27,8 +27,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, JwtCookieFilter jwtCookieFilter, ApiKeyFilter apiKeyFilter) {
 
         http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+                .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")))
+                .authorizeHttpRequests(auth -> auth.
+                        requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout").permitAll().
+                        anyRequest().authenticated()
+                )
+                .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtCookieFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
