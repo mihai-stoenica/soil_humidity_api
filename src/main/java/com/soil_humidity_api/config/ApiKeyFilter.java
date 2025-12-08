@@ -29,6 +29,10 @@ public class ApiKeyFilter extends OncePerRequestFilter {
 
         String apiKey = request.getHeader("X-API-KEY");
 
+        if (apiKey == null) {
+            apiKey = request.getParameter("apiKey");
+        }
+
         if (apiKey != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             var device = deviceRepository.findByApiKey(apiKey).orElse(null);
