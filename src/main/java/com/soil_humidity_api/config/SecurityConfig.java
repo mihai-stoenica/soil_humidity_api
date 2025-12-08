@@ -36,7 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout", "/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
+                //.addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
                 /*.addFilterBefore(jwtCookieFilter, UsernamePasswordAuthenticationFilter.class)*/;
         return http.build();
     }
