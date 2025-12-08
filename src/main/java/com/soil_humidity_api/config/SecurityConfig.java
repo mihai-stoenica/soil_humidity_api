@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")))
                 .authorizeHttpRequests(auth -> auth.
-                        requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout", "/ws/**", "**").permitAll().
+                        requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout", "/ws/**").permitAll().
                         anyRequest().authenticated()
                 )
                 .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
