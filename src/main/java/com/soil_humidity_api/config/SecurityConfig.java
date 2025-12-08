@@ -45,7 +45,7 @@ public class SecurityConfig {
         //configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
 
         configuration.setAllowedOriginPatterns(List.of(
-                "ws://192.168.*.*",
+                "192.168.*.*",
                 "http://10.*.*.*",
                 "http://172.16.*.*",
                 "http://localhost:*"
