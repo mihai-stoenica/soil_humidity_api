@@ -25,7 +25,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtCookieFilter jwtCookieFilter, ApiKeyFilter apiKeyFilter) {
-
+        System.out.println("allowed origins: " + allowedOrigins);
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
