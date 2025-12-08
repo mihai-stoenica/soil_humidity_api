@@ -35,7 +35,6 @@ public class JwtCookieFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
 
         String token = null;
 

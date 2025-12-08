@@ -29,7 +29,7 @@ public class SecurityConfig {
         http
                 //.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth. requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout", "/ws/**").permitAll(). anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth. requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout"/*, "/ws/**"*/).permitAll(). anyRequest().authenticated()
                 )
                 .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtCookieFilter, UsernamePasswordAuthenticationFilter.class);
