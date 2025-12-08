@@ -37,7 +37,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtCookieFilter, UsernamePasswordAuthenticationFilter.class);
+                /*.addFilterBefore(jwtCookieFilter, UsernamePasswordAuthenticationFilter.class)*/;
         return http.build();
     }
 
