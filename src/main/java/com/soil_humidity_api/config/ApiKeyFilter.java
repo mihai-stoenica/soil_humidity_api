@@ -32,6 +32,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         if (apiKey == null) {
             apiKey = request.getParameter("apiKey");
         }
+        System.out.println("Api key: " + apiKey);
 
         if (apiKey != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
