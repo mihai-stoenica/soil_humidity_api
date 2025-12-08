@@ -42,7 +42,14 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+        //configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://192.168.*.*",
+                "http://10.*.*.*",
+                "http://172.16.*.*",
+                "http://localhost:*"
+        ));
 
         configuration.setAllowedMethods(List.of("*"));
 
