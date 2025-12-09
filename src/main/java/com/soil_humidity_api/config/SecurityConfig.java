@@ -42,7 +42,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        List<String> origins = List.of("192.168.1.1");
+        List<String> origins = List.of("192.168.1.5");
 
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(origins);
