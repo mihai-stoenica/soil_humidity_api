@@ -27,6 +27,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, JwtCookieFilter jwtCookieFilter, ApiKeyFilter apiKeyFilter) {
         //System.out.println("allowed origins: " + allowedOrigins);
         http
+                .cors(Customizer.withDefaults())
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth. requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout")
@@ -36,6 +37,24 @@ public class SecurityConfig {
                 .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtCookieFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        List<String> origins = List.of("192.168.1.1");
+
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(origins);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 
     @Bean
