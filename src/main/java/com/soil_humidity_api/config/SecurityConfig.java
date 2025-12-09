@@ -28,7 +28,7 @@ public class SecurityConfig {
         //System.out.println("allowed origins: " + allowedOrigins);
         http
                 //.cors(Customizer.withDefaults())
-                .cors(AbstractHttpConfigurer::disable)
+                //.cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth. requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout")
                         .permitAll(). anyRequest().
