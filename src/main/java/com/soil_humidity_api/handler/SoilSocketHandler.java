@@ -19,15 +19,6 @@ public class SoilSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) {
         System.out.println("Device Registered");
-        /*String query = session.getUri().getQuery();
-        String apiKey = extractApiKey(query);
-
-        if(apiKey != null) {
-            deviceSessions.put(apiKey, session);
-            System.out.println("Device Registered: " + apiKey);
-        } else {
-            session.close(CloseStatus.BAD_DATA);
-        }*/
 
     }
 
@@ -35,12 +26,6 @@ public class SoilSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) {
 
         System.out.println("Device Disconnected");
-        /*String query = session.getUri().getQuery();
-        String apiKey = extractApiKey(query);
-        if (apiKey != null) {
-            deviceSessions.remove(apiKey);
-            System.out.println("Device Disconnected: " + apiKey);
-        }*/
     }
 
     @Override
