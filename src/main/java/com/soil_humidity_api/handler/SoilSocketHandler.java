@@ -4,7 +4,6 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
@@ -29,12 +28,8 @@ public class SoilSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) {
-        if (message instanceof TextMessage textMessage) {
-            System.out.println("Received message: " + textMessage.getPayload());
-        } else {
-            System.out.println("Received non-text message: " + message);
-        }
+    protected void handleTextMessage(@NonNull WebSocketSession session, TextMessage message) {
+        System.out.println("Received message: " + message.getPayload());
     }
 
     private String extractApiKey(String query) {
