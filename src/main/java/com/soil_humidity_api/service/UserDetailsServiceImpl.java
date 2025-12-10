@@ -2,7 +2,7 @@ package com.soil_humidity_api.service;
 
 import com.soil_humidity_api.entity.User;
 import com.soil_humidity_api.repository.UserRepository;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,7 +20,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(@NonNull String email) {
+    @NullMarked
+    public UserDetails loadUserByUsername(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Not found"));
         return new org.springframework.security.core.userdetails.User(

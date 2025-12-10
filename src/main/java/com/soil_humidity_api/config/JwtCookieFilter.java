@@ -35,6 +35,10 @@ public class JwtCookieFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String token = null;
 
@@ -46,9 +50,11 @@ public class JwtCookieFilter extends OncePerRequestFilter {
             }
         }
 
+        System.out.println("Token: " + token);
+
         if (token != null && jwtService.isTokenValid(token)) {
             String email = jwtService.extractUsername(token);
-
+            System.out.println("Email: " + email);
             UserDetails user = userDetailsService.loadUserByUsername(email);
 
             UsernamePasswordAuthenticationToken authToken =
