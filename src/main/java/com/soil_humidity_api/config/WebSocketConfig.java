@@ -1,23 +1,26 @@
 package com.soil_humidity_api.config;
 
-import com.soil_humidity_api.handler.SoilSocketHandler;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer {
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final SoilSocketHandler soilSocketHandler;
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic", "/queue");
 
-    public WebSocketConfig(SoilSocketHandler soilSocketHandler) {
-        this.soilSocketHandler = soilSocketHandler;
+        config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(soilSocketHandler, "/ws/soil").setAllowedOrigins("*");
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/stomp-ws")
+                .setAllowedOrigins("*")
+                .withSockJS(); // SockJS adds compatibility, but is optional
     }
 }
