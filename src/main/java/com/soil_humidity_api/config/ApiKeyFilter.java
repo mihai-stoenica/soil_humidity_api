@@ -45,6 +45,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             var device = deviceRepository.findByApiKey(apiKey).orElse(null);
 
             if (device != null) {
+                System.out.println("Device found");
                 UserDetails userDetails = new User(device.getName(), "",
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_DEVICE")));
 
