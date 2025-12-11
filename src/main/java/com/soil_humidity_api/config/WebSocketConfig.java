@@ -1,23 +1,37 @@
 package com.soil_humidity_api.config;
 
-import com.soil_humidity_api.handler.SoilSocketHandler;
+import com.soil_humidity_api.handler.EspWebSocketHandler;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer {
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSocketConfigurer  {
+    private final EspWebSocketHandler espHandler;
 
-    private final SoilSocketHandler soilSocketHandler;
+    public WebSocketConfig(EspWebSocketHandler espHandler) {
+        this.espHandler = espHandler;
+    }
 
-    public WebSocketConfig(SoilSocketHandler soilSocketHandler) {
-        this.soilSocketHandler = soilSocketHandler;
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        // For frontend subscriptions
+        config.enableSimpleBroker("/topic");
+        config.setApplicationDestinationPrefixes("/app");
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // Frontend STOMP endpoint (no SockJS needed)
+        registry.addEndpoint("/stomp-ws")
+                .setAllowedOriginPatterns("*");
     }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(soilSocketHandler, "/ws/soil").setAllowedOrigins("*");
+        // ESP WebSocket handler
+        registry.addHandler(espHandler, "/esp-ws")
+                .setAllowedOriginPatterns("*");
     }
 }
