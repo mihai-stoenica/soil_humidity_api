@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api/devices")
 @RequiredArgsConstructor
@@ -23,18 +26,18 @@ public class DeviceController {
 
     @PostMapping("/claim")
     public ResponseEntity<?> claimDevice(@RequestBody DeviceClaimDto request) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
         User user = userRepository.findByEmail(email).orElseThrow();
 
         if (deviceRepository.existsByApiKey(request.apiKey())) {
-            return ResponseEntity.badRequest().body("Device already claimed by someone!");
+            return ResponseEntity.badRequest().body(Map.of("message", "Device already claimed by someone!"));
         }
 
         Device device = new Device(request.name(), request.apiKey());
         device.setUser(user);
         deviceRepository.save(device);
 
-        return ResponseEntity.ok().body("Device claimed: " + device.getName());
+        return ResponseEntity.ok().body(device);
     }
 
 }

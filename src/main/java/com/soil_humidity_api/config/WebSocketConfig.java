@@ -1,37 +1,29 @@
 package com.soil_humidity_api.config;
 
-import com.soil_humidity_api.handler.EspWebSocketHandler;
+import com.soil_humidity_api.repository.DeviceRepository;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSocketConfigurer  {
-    private final EspWebSocketHandler espHandler;
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    private final DeviceRepository deviceRepository;
 
-    public WebSocketConfig(EspWebSocketHandler espHandler) {
-        this.espHandler = espHandler;
-    }
-
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        // For frontend subscriptions
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
+    public WebSocketConfig(DeviceRepository deviceRepository) {
+        this.deviceRepository = deviceRepository;
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Frontend STOMP endpoint (no SockJS needed)
-        registry.addEndpoint("/stomp-ws")
+        registry.addEndpoint("/ws/soil")
+                .addInterceptors(new AuthHandshakeInterceptor(deviceRepository))
                 .setAllowedOriginPatterns("*");
     }
 
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        // ESP WebSocket handler
-        registry.addHandler(espHandler, "/esp-ws")
-                .setAllowedOriginPatterns("*");
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.enableSimpleBroker("/topic", "/queue");
+        registry.setApplicationDestinationPrefixes("/app");
     }
 }
