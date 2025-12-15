@@ -1,7 +1,11 @@
 package com.soil_humidity_api.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
+
+import java.time.Instant;
 
 @Entity
 @Getter
@@ -9,6 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @RequiredArgsConstructor
 public class Device {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,4 +28,10 @@ public class Device {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Min(value = 0, message = "Humidity cannot be less than 0%")
+    @Max(value = 100, message = "Humidity cannot be more than 100%")
+    private Integer lastHumidity = null;
+
+    private Instant lastSeen = null;
 }

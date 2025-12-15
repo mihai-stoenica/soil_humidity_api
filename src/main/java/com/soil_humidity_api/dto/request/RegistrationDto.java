@@ -1,4 +1,4 @@
-package com.soil_humidity_api.dto;
+package com.soil_humidity_api.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

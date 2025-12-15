@@ -32,7 +32,8 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
                 User owner = device.getUser();
 
                 if (owner != null) {
-                    attributes.put("targetUserId", String.valueOf(owner.getId()));
+                    attributes.put("userId", String.valueOf(owner.getId()));
+                    attributes.put("deviceId", device.getId());
                     return true;
                 }
             }

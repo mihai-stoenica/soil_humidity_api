@@ -1,7 +1,8 @@
 package com.soil_humidity_api.controller;
 
-import com.soil_humidity_api.dto.LoginDto;
-import com.soil_humidity_api.dto.RegistrationDto;
+import com.soil_humidity_api.dto.request.LoginDto;
+import com.soil_humidity_api.dto.request.RegistrationDto;
+import com.soil_humidity_api.dto.response.UserDto;
 import com.soil_humidity_api.entity.User;
 import com.soil_humidity_api.repository.UserRepository;
 import com.soil_humidity_api.service.JwtService;
@@ -40,7 +41,9 @@ public class AuthController {
 
         userRepository.save(newUser);
 
-        return ResponseEntity.ok().body(newUser);
+        UserDto userDto = new UserDto(newUser.getId(), newUser.getName(), newUser.getEmail());
+
+        return ResponseEntity.ok().body(userDto);
     }
 
     @PostMapping("/login")
@@ -62,9 +65,11 @@ public class AuthController {
                 .sameSite("Lax")
                 .build();
 
+        UserDto userDto = new UserDto(existingUser.get().getId(), existingUser.get().getName(), existingUser.get().getEmail());
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(existingUser.get());
+                .body(userDto);
     }
 
     @PostMapping("/logout")
