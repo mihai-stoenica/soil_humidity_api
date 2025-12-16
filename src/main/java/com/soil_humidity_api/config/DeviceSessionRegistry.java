@@ -20,7 +20,7 @@ public class DeviceSessionRegistry {
     public void unregister(String sessionId) {
         Long deviceId = sessionIdToDeviceId.remove(sessionId);
         if (deviceId != null) {
-            deviceIdToSessionId.remove(deviceId);
+            deviceIdToSessionId.remove(deviceId, sessionId);
         }
     }
 
