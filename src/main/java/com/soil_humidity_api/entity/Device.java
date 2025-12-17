@@ -3,6 +3,7 @@ package com.soil_humidity_api.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.Instant;
@@ -28,6 +29,10 @@ public class Device {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToOne(mappedBy = "device", cascade = CascadeType.ALL)
+    @NotNull
+    private Preset preset;
 
     @Min(value = 0, message = "Humidity cannot be less than 0%")
     @Max(value = 100, message = "Humidity cannot be more than 100%")

@@ -1,3 +1,3 @@
 package com.soil_humidity_api.dto.request;
 
-public record DeviceClaimDto(String apiKey, String name) { }
+public record DeviceClaimDto(String apiKey, String name, Integer watering_time) { }

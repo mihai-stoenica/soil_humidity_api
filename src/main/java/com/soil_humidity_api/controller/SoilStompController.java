@@ -1,8 +1,12 @@
 package com.soil_humidity_api.controller;
 
+import com.soil_humidity_api.dto.ws.SensorCommandDto;
 import com.soil_humidity_api.dto.ws.SensorDataDto;
+import com.soil_humidity_api.dto.ws.UserDataDto;
 import com.soil_humidity_api.entity.Device;
+import com.soil_humidity_api.entity.Preset;
 import com.soil_humidity_api.repository.DeviceRepository;
+import jakarta.validation.Valid;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -26,7 +30,7 @@ public class SoilStompController {
 
     @MessageMapping("/device")
     @SendTo("/topic/device")
-    public void handleDeviceMessage(@Payload SensorDataDto payload, SimpMessageHeaderAccessor headerAccessor) {
+    public void handleDeviceMessage(@Valid @Payload SensorDataDto payload, SimpMessageHeaderAccessor headerAccessor) {
 
         if (payload.humidity() == null) {
             System.err.println("Received empty humidity data");
@@ -35,12 +39,11 @@ public class SoilStompController {
         Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
 
         assert sessionAttributes != null;
-        String ownerUserId = (String) sessionAttributes.get("userId");
 
         Long deviceId = (Long) sessionAttributes.get("deviceId");
 
-        if (ownerUserId == null || deviceId == null) {
-            System.out.println("Error: Missing User ID or DeviceId found in session. Interceptor might have failed.");
+        if (deviceId == null) {
+            System.out.println("Error: Missing DeviceId found in session. Interceptor might have failed.");
             return;
         }
 
@@ -54,9 +57,33 @@ public class SoilStompController {
             deviceRepository.save(device);
         }
 
-        System.out.println("Routing data to User ID: " + ownerUserId);
+        messagingTemplate.convertAndSend("/topic/device/" + deviceId, payload);
+    }
 
-        messagingTemplate.convertAndSend("/topic/device/" + ownerUserId, payload);
+    @MessageMapping("/user")
+    @SendTo("/topic/user")
+    public void handleUserMessage(@Valid @Payload UserDataDto payload) {
+
+        Long deviceId = payload.deviceId();
+
+        if (deviceId == null) {
+            System.out.println("Error: Missing DeviceId found in session. Interceptor might have failed.");
+            return;
+        }
+        Optional<Device> deviceOpt = deviceRepository.findById(deviceId);
+        Device device;
+        Preset preset;
+        if(deviceOpt.isPresent()) {
+            device = deviceOpt.get();
+            preset = device.getPreset();
+        } else {
+            System.out.println("Error: Device does not exist.");
+            return;
+        }
+
+        SensorCommandDto response = new SensorCommandDto(payload.command(), preset.getWatering_time());
+        System.out.println(response);
+        messagingTemplate.convertAndSend("/topic/user/" + device.getApiKey(), response);
     }
 }
 
