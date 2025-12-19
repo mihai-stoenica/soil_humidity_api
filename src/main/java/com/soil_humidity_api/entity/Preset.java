@@ -1,5 +1,6 @@
 package com.soil_humidity_api.entity;
 
+import com.soil_humidity_api.enums.Pattern;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -22,4 +23,11 @@ public class Preset {
     @NotNull
     @JoinColumn(name = "device_id")
     private Device device;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private Pattern pattern = Pattern.CONTINUOUS;
+
+    private Integer steps;
+    private Integer delay;
 }

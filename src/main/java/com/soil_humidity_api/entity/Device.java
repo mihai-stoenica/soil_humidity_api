@@ -39,4 +39,5 @@ public class Device {
     private Integer lastHumidity = null;
 
     private Instant lastSeen = null;
+
 }

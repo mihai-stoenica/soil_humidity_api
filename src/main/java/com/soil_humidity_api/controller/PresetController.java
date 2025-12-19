@@ -1,6 +1,9 @@
 package com.soil_humidity_api.controller;
 
-import com.soil_humidity_api.dto.request.PresetDto;
+import com.soil_humidity_api.dto.request.ContinuousPresetDto;
+import com.soil_humidity_api.dto.request.PresetRequest;
+import com.soil_humidity_api.dto.request.StepPresetDto;
+import com.soil_humidity_api.entity.Device;
 import com.soil_humidity_api.entity.Preset;
 import com.soil_humidity_api.repository.PresetRepository;
 import jakarta.validation.Valid;
@@ -14,16 +17,33 @@ import org.springframework.web.bind.annotation.*;
 public class PresetController {
     private final PresetRepository presetRepository;
 
-    @PostMapping("/{id}")
-    public ResponseEntity<?> update(@Valid @RequestBody PresetDto request, @PathVariable("id") Preset preset) {
+    @PostMapping("/{deviceId}")
+    public ResponseEntity<?> update(@Valid @RequestBody PresetRequest request, @PathVariable("deviceId") Device device) {
+        if(device == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Preset preset = device.getPreset();
+
         if(preset == null) {
             return ResponseEntity.notFound().build();
         }
 
         preset.setWatering_time(request.watering_time());
+        preset.setPattern(request.pattern());
+
+        if (request instanceof StepPresetDto stepRequest) {
+            preset.setSteps(stepRequest.steps());
+            preset.setDelay(stepRequest.delay());
+
+        } else if (request instanceof ContinuousPresetDto) {
+            preset.setSteps(null);
+            preset.setDelay(null);
+        }
+
         presetRepository.save(preset);
 
-        PresetDto response = new PresetDto(preset.getWatering_time());
+        StepPresetDto response =  new StepPresetDto(preset.getWatering_time(), preset.getPattern(), preset.getSteps(), preset.getDelay());
 
         return ResponseEntity.ok(response);
     }
