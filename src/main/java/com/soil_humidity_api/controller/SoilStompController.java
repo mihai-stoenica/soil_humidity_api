@@ -1,10 +1,12 @@
 package com.soil_humidity_api.controller;
 
-import com.soil_humidity_api.dto.ws.SensorCommandDto;
+import com.soil_humidity_api.dto.ws.ContinuousSensorCommandDto;
 import com.soil_humidity_api.dto.ws.SensorDataDto;
+import com.soil_humidity_api.dto.ws.StepSensorCommandDto;
 import com.soil_humidity_api.dto.ws.UserDataDto;
 import com.soil_humidity_api.entity.Device;
 import com.soil_humidity_api.entity.Preset;
+import com.soil_humidity_api.enums.Pattern;
 import com.soil_humidity_api.repository.DeviceRepository;
 import jakarta.validation.Valid;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -81,9 +83,16 @@ public class SoilStompController {
             return;
         }
 
-        SensorCommandDto response = new SensorCommandDto(payload.command(), preset.getWatering_time());
-        System.out.println(response);
-        messagingTemplate.convertAndSend("/topic/user/" + device.getApiKey(), response);
+        if(preset.getPattern() == Pattern.CONTINUOUS) {
+            ContinuousSensorCommandDto response = new ContinuousSensorCommandDto(payload.command(), preset.getWatering_time(), preset.getPattern());
+            messagingTemplate.convertAndSend("/topic/user/" + device.getApiKey(), response);
+        } else if(preset.getPattern() == Pattern.STEP) {
+            StepSensorCommandDto response = new StepSensorCommandDto(payload.command(), preset.getWatering_time(), preset.getPattern(), preset.getSteps(), preset.getDelay());
+            messagingTemplate.convertAndSend("/topic/user/" + device.getApiKey(), response);
+        }
+
+
+
     }
 }
 
