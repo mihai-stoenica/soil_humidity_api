@@ -19,9 +19,9 @@ public class Preset {
     @NonNull
     private Integer watering_time;
 
-    @OneToOne
+    @ManyToOne
     @NotNull
-    @JoinColumn(name = "device_id")
+    @JoinColumn(name = "device_id", nullable = false)
     private Device device;
 
     @Enumerated(EnumType.STRING)
@@ -30,4 +30,5 @@ public class Preset {
 
     private Integer steps;
     private Integer delay;
+
 }

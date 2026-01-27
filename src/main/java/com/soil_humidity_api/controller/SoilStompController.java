@@ -77,7 +77,7 @@ public class SoilStompController {
         Preset preset;
         if(deviceOpt.isPresent()) {
             device = deviceOpt.get();
-            preset = device.getPreset();
+            preset = device.getActivePreset();
         } else {
             System.out.println("Error: Device does not exist.");
             return;

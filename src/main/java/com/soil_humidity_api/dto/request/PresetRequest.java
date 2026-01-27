@@ -15,6 +15,7 @@ import com.soil_humidity_api.enums.Pattern;
         @JsonSubTypes.Type(value = StepPresetDto.class, name = "step")
 })
 public sealed interface PresetRequest permits ContinuousPresetDto, StepPresetDto {
+    Long id();
     Integer watering_time();
     Pattern pattern();
 }

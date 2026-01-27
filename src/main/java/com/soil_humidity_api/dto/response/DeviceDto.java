@@ -7,5 +7,6 @@ public record DeviceDto(
         String name,
         boolean connected,
         Instant lastSeen,
-        Integer lastHumidity
+        Integer lastHumidity,
+        Long activePreset
 ) { }

@@ -40,11 +40,11 @@ public class DeviceController {
         Device device = new Device(request.name(), request.apiKey());
         preset.setDevice(device);
         device.setUser(user);
-        device.setPreset(preset);
+        device.addPreset(preset);
         deviceRepository.save(device);
 
 
-        DeviceDto deviceDto = new DeviceDto(device.getId(), device.getName(), deviceSessionRegistry.isDeviceConnected(device.getId()), device.getLastSeen(), device.getLastHumidity());
+        DeviceDto deviceDto = new DeviceDto(device.getId(), device.getName(), deviceSessionRegistry.isDeviceConnected(device.getId()), device.getLastSeen(), device.getLastHumidity(), device.getActivePreset().getId());
 
         return ResponseEntity.ok(deviceDto);
     }
@@ -57,7 +57,7 @@ public class DeviceController {
 
         List<DeviceDto> devices = user.getDevices()
                 .stream()
-                .map(d -> new DeviceDto(d.getId(), d.getName(), deviceSessionRegistry.isDeviceConnected(d.getId()), d.getLastSeen(), d.getLastHumidity()))
+                .map(d -> new DeviceDto(d.getId(), d.getName(), deviceSessionRegistry.isDeviceConnected(d.getId()), d.getLastSeen(), d.getLastHumidity(), d.getActivePreset().getId()))
                 .toList();
 
         return ResponseEntity.ok(devices);
@@ -81,7 +81,7 @@ public class DeviceController {
         if (!device.getUser().getId().equals(currentUser.getId())) {
             return ResponseEntity.status(403).build();
         }
-        DeviceDto deviceDto = new DeviceDto(device.getId(), device.getName(), deviceSessionRegistry.isDeviceConnected(device.getId()), device.getLastSeen(), device.getLastHumidity());
+        DeviceDto deviceDto = new DeviceDto(device.getId(), device.getName(), deviceSessionRegistry.isDeviceConnected(device.getId()), device.getLastSeen(), device.getLastHumidity(), device.getActivePreset().getId());
         return ResponseEntity.ok(deviceDto);
     }
 
