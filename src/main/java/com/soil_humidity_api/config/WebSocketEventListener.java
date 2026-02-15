@@ -34,9 +34,11 @@ public class WebSocketEventListener {
 
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
-        String sessionId = event.getSessionId();
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        String sessionId = accessor.getSessionId();
+
         registry.unregister(sessionId);
-        System.out.println("Session disconnected: " + sessionId);
+        System.out.println("Unregistered Session: " + sessionId);
     }
 }
 
