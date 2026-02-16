@@ -33,8 +33,9 @@ public class SoilStompController {
     @MessageMapping("/device")
     @SendTo("/topic/device")
     public void handleDeviceMessage(@Valid @Payload SensorDataDto payload, SimpMessageHeaderAccessor headerAccessor) {
+        System.out.println("Received body: " + payload);
 
-        if (payload.humidity() == null) {
+        if (payload.humidity() == null || payload.temperature() == null) {
             System.err.println("Received empty humidity data");
             return;
         }
