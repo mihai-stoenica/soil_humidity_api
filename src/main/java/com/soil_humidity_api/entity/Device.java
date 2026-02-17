@@ -46,6 +46,11 @@ public class Device {
 
     private Instant lastSeen = null;
 
+    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL)
+    @NotNull
+    private List<Humidity> humidities = new ArrayList<>();
+
+
     public void addPreset(Preset preset) {
         presets.add(preset);
         preset.setDevice(this);
