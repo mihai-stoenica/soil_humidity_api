@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,5 +41,9 @@ public class Device {
     private Integer lastHumidity = null;
 
     private Instant lastSeen = null;
+
+    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL)
+    @NotNull
+    private List<Humidity> humidities = new ArrayList<>();
 
 }
