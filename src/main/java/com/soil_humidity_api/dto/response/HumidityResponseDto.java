@@ -1,10 +1,9 @@
 package com.soil_humidity_api.dto.response;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 public record HumidityResponseDto(
-        Long id,
-        Integer value,
-        LocalDateTime timestamp
+        List<SingleHumidityResponseDto> records,
+        Integer totalPages
 ) {
 }

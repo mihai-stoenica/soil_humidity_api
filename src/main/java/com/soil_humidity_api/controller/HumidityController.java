@@ -2,6 +2,7 @@ package com.soil_humidity_api.controller;
 
 import com.soil_humidity_api.dto.request.HumidityRequestDto;
 import com.soil_humidity_api.dto.response.HumidityResponseDto;
+import com.soil_humidity_api.dto.response.SingleHumidityResponseDto;
 import com.soil_humidity_api.entity.Device;
 import com.soil_humidity_api.entity.Humidity;
 import com.soil_humidity_api.repository.DeviceRepository;
@@ -11,9 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -42,7 +43,7 @@ public class HumidityController {
 
         humidityRepository.save(humidity);
 
-        HumidityResponseDto responseDto = new HumidityResponseDto(humidity.getId(), humidity.getValue(), humidity.getTimestamp());
+        SingleHumidityResponseDto responseDto = new SingleHumidityResponseDto(humidity.getId(), humidity.getValue(), humidity.getTimestamp());
 
         return ResponseEntity.ok().body(responseDto);
     }
@@ -54,12 +55,20 @@ public class HumidityController {
     ) {
         Page<Humidity> resultPage = humidityService.getHumidityData(page, size);
 
-        Page<HumidityResponseDto> dtoPage = resultPage.map(humidity -> new HumidityResponseDto(
-                humidity.getId(),
-                humidity.getValue(),
-                humidity.getTimestamp()
-        ));
+        List<SingleHumidityResponseDto> records = resultPage.getContent()
+                .stream()
+                .map(humidity -> new SingleHumidityResponseDto(
+                        humidity.getId(),
+                        humidity.getValue(),
+                        humidity.getTimestamp()
+                ))
+                .toList();
 
-        return ResponseEntity.ok(dtoPage.getContent());
+        HumidityResponseDto response = new HumidityResponseDto(
+                records,
+                resultPage.getTotalPages()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }
