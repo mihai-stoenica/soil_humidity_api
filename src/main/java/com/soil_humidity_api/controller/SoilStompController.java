@@ -7,8 +7,11 @@ import com.soil_humidity_api.dto.ws.UserDataDto;
 import com.soil_humidity_api.entity.Device;
 import com.soil_humidity_api.entity.Preset;
 import com.soil_humidity_api.enums.Pattern;
+import com.soil_humidity_api.mapper.ContinuousCommandMapper;
+import com.soil_humidity_api.mapper.StepCommandMapper;
 import com.soil_humidity_api.repository.DeviceRepository;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -21,19 +24,16 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@AllArgsConstructor
 public class SoilStompController {
     private final SimpMessagingTemplate messagingTemplate;
     private final DeviceRepository deviceRepository;
-
-    public SoilStompController(SimpMessagingTemplate messagingTemplate, DeviceRepository deviceRepository) {
-        this.messagingTemplate = messagingTemplate;
-        this.deviceRepository = deviceRepository;
-    }
+    private final ContinuousCommandMapper continuousCommandMapper;
+    private final StepCommandMapper stepCommandMapper;
 
     @MessageMapping("/device")
     @SendTo("/topic/device")
     public void handleDeviceMessage(@Valid @Payload SensorDataDto payload, SimpMessageHeaderAccessor headerAccessor) {
-        System.out.println("Received body: " + payload);
 
         if (payload.humidity() == null || payload.temperature() == null) {
             System.err.println("Received empty humidity data");
@@ -85,10 +85,10 @@ public class SoilStompController {
         }
 
         if(preset.getPattern() == Pattern.CONTINUOUS) {
-            ContinuousSensorCommandDto response = new ContinuousSensorCommandDto(payload.command(), preset.getWatering_time(), preset.getPattern());
+            ContinuousSensorCommandDto response = continuousCommandMapper.toDto(preset, payload);
             messagingTemplate.convertAndSend("/topic/user/" + device.getApiKey(), response);
         } else if(preset.getPattern() == Pattern.STEP) {
-            StepSensorCommandDto response = new StepSensorCommandDto(payload.command(), preset.getWatering_time(), preset.getPattern(), preset.getSteps(), preset.getDelay());
+            StepSensorCommandDto response = stepCommandMapper.toDto(preset, payload);
             messagingTemplate.convertAndSend("/topic/user/" + device.getApiKey(), response);
         }
 

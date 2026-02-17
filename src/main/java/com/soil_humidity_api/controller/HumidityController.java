@@ -5,6 +5,8 @@ import com.soil_humidity_api.dto.response.HumidityResponseDto;
 import com.soil_humidity_api.dto.response.SingleHumidityResponseDto;
 import com.soil_humidity_api.entity.Device;
 import com.soil_humidity_api.entity.Humidity;
+import com.soil_humidity_api.mapper.HumidityRecordMapper;
+import com.soil_humidity_api.mapper.SingleHumidityRecordMapper;
 import com.soil_humidity_api.repository.DeviceRepository;
 import com.soil_humidity_api.repository.HumidityRepository;
 import com.soil_humidity_api.service.HumidityService;
@@ -24,6 +26,8 @@ public class HumidityController {
     private final HumidityRepository humidityRepository;
     private final HumidityService humidityService;
     private final DeviceRepository deviceRepository;
+    private final SingleHumidityRecordMapper singleHumidityRecordMapper;
+    private final HumidityRecordMapper humidityRecordMapper;
 
     @PostMapping("/save")
     public ResponseEntity<?> save(@RequestBody HumidityRequestDto request, HttpServletRequest r) {
@@ -43,9 +47,9 @@ public class HumidityController {
 
         humidityRepository.save(humidity);
 
-        SingleHumidityResponseDto responseDto = new SingleHumidityResponseDto(humidity.getId(), humidity.getValue(), humidity.getTimestamp());
+        SingleHumidityResponseDto response = singleHumidityRecordMapper.toDto(humidity);
 
-        return ResponseEntity.ok().body(responseDto);
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/history/device/{deviceId}")
@@ -57,17 +61,10 @@ public class HumidityController {
 
         List<SingleHumidityResponseDto> records = resultPage.getContent()
                 .stream()
-                .map(humidity -> new SingleHumidityResponseDto(
-                        humidity.getId(),
-                        humidity.getValue(),
-                        humidity.getTimestamp()
-                ))
+                .map(singleHumidityRecordMapper::toDto)
                 .toList();
 
-        HumidityResponseDto response = new HumidityResponseDto(
-                records,
-                resultPage.getTotalPages()
-        );
+        HumidityResponseDto response = humidityRecordMapper.toDto(records, resultPage.getTotalPages());
 
         return ResponseEntity.ok(response);
     }

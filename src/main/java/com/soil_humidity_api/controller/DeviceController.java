@@ -1,13 +1,14 @@
 package com.soil_humidity_api.controller;
 
-import com.soil_humidity_api.config.DeviceSessionRegistry;
 import com.soil_humidity_api.dto.request.DeviceClaimDto;
 import com.soil_humidity_api.dto.response.DeviceDto;
 import com.soil_humidity_api.entity.Device;
 import com.soil_humidity_api.entity.Preset;
 import com.soil_humidity_api.entity.User;
+import com.soil_humidity_api.mapper.DeviceMapper;
 import com.soil_humidity_api.repository.DeviceRepository;
 import com.soil_humidity_api.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,10 +26,10 @@ public class DeviceController {
 
     private final DeviceRepository deviceRepository;
     private final UserRepository userRepository;
-    private final DeviceSessionRegistry deviceSessionRegistry;
+    private final DeviceMapper deviceMapper;
 
     @PostMapping("/claim")
-    public ResponseEntity<?> claimDevice(@RequestBody DeviceClaimDto request) {
+    public ResponseEntity<?> claimDevice(@Valid @RequestBody DeviceClaimDto request) {
         String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
         User user = userRepository.findByEmail(email).orElseThrow();
 
@@ -44,9 +45,9 @@ public class DeviceController {
         deviceRepository.save(device);
 
 
-        DeviceDto deviceDto = new DeviceDto(device.getId(), device.getName(), deviceSessionRegistry.isDeviceConnected(device.getId()), device.getLastSeen(), device.getLastHumidity(), device.getActivePreset().getId());
+        DeviceDto response = deviceMapper.toDto(device);
 
-        return ResponseEntity.ok(deviceDto);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/")
@@ -57,7 +58,7 @@ public class DeviceController {
 
         List<DeviceDto> devices = user.getDevices()
                 .stream()
-                .map(d -> new DeviceDto(d.getId(), d.getName(), deviceSessionRegistry.isDeviceConnected(d.getId()), d.getLastSeen(), d.getLastHumidity(), d.getActivePreset().getId()))
+                .map(deviceMapper::toDto)
                 .toList();
 
         return ResponseEntity.ok(devices);
@@ -81,8 +82,8 @@ public class DeviceController {
         if (!device.getUser().getId().equals(currentUser.getId())) {
             return ResponseEntity.status(403).build();
         }
-        DeviceDto deviceDto = new DeviceDto(device.getId(), device.getName(), deviceSessionRegistry.isDeviceConnected(device.getId()), device.getLastSeen(), device.getLastHumidity(), device.getActivePreset().getId());
-        return ResponseEntity.ok(deviceDto);
+        DeviceDto response = deviceMapper.toDto(device);
+        return ResponseEntity.ok(response);
     }
 
 }

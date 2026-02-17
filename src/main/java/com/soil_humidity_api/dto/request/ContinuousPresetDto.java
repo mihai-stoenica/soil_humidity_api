@@ -5,9 +5,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public record ContinuousPresetDto(
-        //@NotNull(message = "Id must not be null")
-        Long id,
-
         @NotNull
         @Min(value = 1)
         Integer watering_time,

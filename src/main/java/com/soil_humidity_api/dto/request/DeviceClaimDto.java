@@ -1,3 +1,18 @@
 package com.soil_humidity_api.dto.request;
 
-public record DeviceClaimDto(String apiKey, String name, Integer watering_time) { }
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
+public record DeviceClaimDto(
+        @NotNull
+        String apiKey,
+
+        @NotNull
+        String name,
+
+        @NotNull
+        @Min(value = 1)
+        @Max(value = 50, message = "Maximum number of seconds is 50.")
+        Integer watering_time
+) { }

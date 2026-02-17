@@ -1,17 +1,17 @@
 package com.soil_humidity_api.mapper;
 
-import com.soil_humidity_api.dto.request.ContinuousPresetDto;
-import com.soil_humidity_api.dto.request.PresetRequest;
-import com.soil_humidity_api.dto.request.StepPresetDto;
+import com.soil_humidity_api.dto.response.ContinuousPresetDtoRes;
+import com.soil_humidity_api.dto.response.PresetResponse;
+import com.soil_humidity_api.dto.response.StepPresetDtoRes;
 import com.soil_humidity_api.entity.Preset;
 import com.soil_humidity_api.enums.Pattern;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PresetMapper {
-    public PresetRequest toDto(Preset preset) {
+    public PresetResponse toDto(Preset preset) {
         if (preset.getPattern() == Pattern.STEP) {
-            return new StepPresetDto(
+            return new StepPresetDtoRes(
                     preset.getId(),
                     preset.getWatering_time(),
                     preset.getPattern(),
@@ -20,7 +20,7 @@ public class PresetMapper {
             );
         }
 
-        return new ContinuousPresetDto(
+        return new ContinuousPresetDtoRes(
                 preset.getId(),
                 preset.getWatering_time(),
                 preset.getPattern()

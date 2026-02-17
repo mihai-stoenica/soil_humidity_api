@@ -3,6 +3,7 @@ package com.soil_humidity_api.controller;
 import com.soil_humidity_api.dto.request.ContinuousPresetDto;
 import com.soil_humidity_api.dto.request.PresetRequest;
 import com.soil_humidity_api.dto.request.StepPresetDto;
+import com.soil_humidity_api.dto.response.PresetResponse;
 import com.soil_humidity_api.entity.Device;
 import com.soil_humidity_api.entity.Preset;
 import com.soil_humidity_api.mapper.PresetMapper;
@@ -48,7 +49,7 @@ public class PresetController {
 
         presetRepository.save(preset);
 
-        PresetRequest response =  presetMapper.toDto(preset);
+        PresetResponse response =  presetMapper.toDto(preset);
 
         return ResponseEntity.ok(response);
     }
@@ -59,7 +60,7 @@ public class PresetController {
             return ResponseEntity.notFound().build();
         }
 
-        List<PresetRequest> response = device.getPresets()
+        List<PresetResponse> response = device.getPresets()
                 .stream()
                 .map(presetMapper::toDto)
                 .toList();
@@ -100,7 +101,7 @@ public class PresetController {
         device.setActivePreset(preset);
         deviceRepository.save(device);
 
-        PresetRequest response =  presetMapper.toDto(preset);
+        PresetResponse response =  presetMapper.toDto(preset);
 
         return ResponseEntity.ok().body(response);
     }

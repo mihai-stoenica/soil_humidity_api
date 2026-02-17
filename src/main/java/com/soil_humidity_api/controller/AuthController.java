@@ -4,6 +4,7 @@ import com.soil_humidity_api.dto.request.LoginDto;
 import com.soil_humidity_api.dto.request.RegistrationDto;
 import com.soil_humidity_api.dto.response.UserDto;
 import com.soil_humidity_api.entity.User;
+import com.soil_humidity_api.mapper.UserMapper;
 import com.soil_humidity_api.repository.UserRepository;
 import com.soil_humidity_api.service.JwtService;
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserMapper userMapper;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationDto request) {
@@ -41,9 +43,9 @@ public class AuthController {
 
         userRepository.save(newUser);
 
-        UserDto userDto = new UserDto(newUser.getId(), newUser.getName(), newUser.getEmail());
+        UserDto response = userMapper.toDto(newUser);
 
-        return ResponseEntity.ok().body(userDto);
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/login")
@@ -65,11 +67,11 @@ public class AuthController {
                 .sameSite("Lax")
                 .build();
 
-        UserDto userDto = new UserDto(existingUser.get().getId(), existingUser.get().getName(), existingUser.get().getEmail());
+        UserDto response = userMapper.toDto(existingUser.get());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(userDto);
+                .body(response);
     }
 
     @PostMapping("/logout")
