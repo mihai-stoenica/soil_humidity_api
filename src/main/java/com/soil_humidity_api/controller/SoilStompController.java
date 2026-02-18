@@ -19,6 +19,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -65,19 +66,27 @@ public class SoilStompController {
 
     @MessageMapping("/user")
     @SendTo("/topic/user")
-    public void handleUserMessage(@Valid @Payload UserDataDto payload) {
+    public void handleUserMessage(@Valid @Payload UserDataDto payload, Principal principal) {
 
+        String email = principal.getName();
         Long deviceId = payload.deviceId();
 
         if (deviceId == null) {
             System.out.println("Error: Missing DeviceId found in session. Interceptor might have failed.");
             return;
         }
+
         Optional<Device> deviceOpt = deviceRepository.findById(deviceId);
         Device device;
         Preset preset;
         if(deviceOpt.isPresent()) {
             device = deviceOpt.get();
+
+            if(!device.getUser().getEmail().equals(email)) {
+                System.out.println("Unauthorized: User " + email + " tried to access device " + deviceId);
+                return;
+            }
+
             preset = device.getActivePreset();
         } else {
             System.out.println("Error: Device does not exist.");

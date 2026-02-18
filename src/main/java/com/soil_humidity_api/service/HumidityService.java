@@ -1,5 +1,6 @@
 package com.soil_humidity_api.service;
 
+import com.soil_humidity_api.entity.Device;
 import com.soil_humidity_api.entity.Humidity;
 import com.soil_humidity_api.repository.HumidityRepository;
 import lombok.AllArgsConstructor;
@@ -15,8 +16,8 @@ import org.springframework.data.domain.Pageable;
 public class HumidityService {
     final HumidityRepository humidityRepository;
 
-    public Page<Humidity> getHumidityData(int page, int size) {
+    public Page<Humidity> getHumidityData(Device device, int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size, Sort.by("timestamp").descending());
-        return humidityRepository.findAll(pageRequest);
+        return humidityRepository.findByDevice(device, pageRequest);
     }
 }

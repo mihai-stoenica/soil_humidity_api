@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,11 +54,16 @@ public class HumidityController {
     }
 
     @GetMapping("/history/device/{deviceId}")
+    @PreAuthorize("hasPermission(#device, 'READ')")
     public ResponseEntity<?> getPaginated(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @PathVariable("deviceId") Device device
     ) {
-        Page<Humidity> resultPage = humidityService.getHumidityData(page, size);
+        if(device == null) {
+            return ResponseEntity.notFound().build();
+        }
+        Page<Humidity> resultPage = humidityService.getHumidityData(device, page, size);
 
         List<SingleHumidityResponseDto> records = resultPage.getContent()
                 .stream()

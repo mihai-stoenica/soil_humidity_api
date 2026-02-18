@@ -12,6 +12,7 @@ import com.soil_humidity_api.repository.PresetRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class PresetController {
     private final DeviceRepository deviceRepository;
 
     @PostMapping("/{deviceId}")
+    @PreAuthorize("hasPermission(#device, 'READ')")
     public ResponseEntity<?> add(@Valid @RequestBody PresetRequest request, @PathVariable("deviceId") Device device) {
         if(device == null) {
             return ResponseEntity.notFound().build();
