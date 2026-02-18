@@ -8,5 +8,6 @@ public record DeviceDto(
         boolean connected,
         Instant lastSeen,
         Integer lastHumidity,
+        Float lastTemperature,
         Long activePreset
 ) { }

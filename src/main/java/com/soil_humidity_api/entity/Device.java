@@ -44,6 +44,8 @@ public class Device {
     @Max(value = 100, message = "Humidity cannot be more than 100%")
     private Integer lastHumidity = null;
 
+    private Float lastTemperature = null;
+
     private Instant lastSeen = null;
 
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL)

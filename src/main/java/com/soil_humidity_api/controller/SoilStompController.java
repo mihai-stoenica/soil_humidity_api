@@ -56,6 +56,7 @@ public class SoilStompController {
             Device device = deviceOpt.get();
 
             device.setLastHumidity(payload.humidity());
+            device.setLastTemperature(payload.temperature());
             device.setLastSeen(Instant.now());
 
             deviceRepository.save(device);

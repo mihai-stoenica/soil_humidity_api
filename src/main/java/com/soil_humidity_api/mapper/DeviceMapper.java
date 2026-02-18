@@ -18,6 +18,7 @@ public class DeviceMapper {
                 deviceSessionRegistry.isDeviceConnected(device.getId()),
                 device.getLastSeen(),
                 device.getLastHumidity(),
+                device.getLastTemperature(),
                 device.getActivePreset().getId()
         );
     }
