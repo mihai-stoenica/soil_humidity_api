@@ -37,7 +37,6 @@ public class SoilStompController {
     public void handleDeviceMessage(@Valid @Payload SensorDataDto payload, SimpMessageHeaderAccessor headerAccessor) {
 
         if (payload.humidity() == null || payload.temperature() == null) {
-            System.err.println("Received empty humidity data");
             return;
         }
         Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
@@ -47,7 +46,6 @@ public class SoilStompController {
         Long deviceId = (Long) sessionAttributes.get("deviceId");
 
         if (deviceId == null) {
-            System.out.println("Error: Missing DeviceId found in session. Interceptor might have failed.");
             return;
         }
 
@@ -73,7 +71,6 @@ public class SoilStompController {
         Long deviceId = payload.deviceId();
 
         if (deviceId == null) {
-            System.out.println("Error: Missing DeviceId found in session. Interceptor might have failed.");
             return;
         }
 
@@ -84,13 +81,11 @@ public class SoilStompController {
             device = deviceOpt.get();
 
             if(!device.getUser().getEmail().equals(email)) {
-                System.out.println("Unauthorized: User " + email + " tried to access device " + deviceId);
                 return;
             }
 
             preset = device.getActivePreset();
         } else {
-            System.out.println("Error: Device does not exist.");
             return;
         }
 

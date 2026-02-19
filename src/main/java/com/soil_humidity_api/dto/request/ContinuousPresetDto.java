@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record ContinuousPresetDto(
         @NotNull
-        @Min(value = 1)
+        @Min(value = 1, message = "The watering time must be greater than 0.")
         Integer watering_time,
 
         @NotNull

@@ -12,7 +12,7 @@ public record DeviceClaimDto(
         String name,
 
         @NotNull
-        @Min(value = 1)
+        @Min(value = 1, message = "Minimum number of seconds is 1.")
         @Max(value = 50, message = "Maximum number of seconds is 50.")
         Integer watering_time
 ) { }
