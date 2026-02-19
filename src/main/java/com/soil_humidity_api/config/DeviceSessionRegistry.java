@@ -3,7 +3,6 @@ package com.soil_humidity_api.config;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -13,6 +12,10 @@ public class DeviceSessionRegistry {
     private final Map<Long, String> deviceIdToSessionId = new ConcurrentHashMap<>();
 
     public void register(String sessionId, Long deviceId) {
+        String oldSession = deviceIdToSessionId.get(deviceId);
+        if(oldSession != null) {
+            sessionIdToDeviceId.remove(oldSession);
+        }
         sessionIdToDeviceId.put(sessionId, deviceId);
         deviceIdToSessionId.put(deviceId, sessionId);
     }
@@ -28,8 +31,5 @@ public class DeviceSessionRegistry {
         return deviceIdToSessionId.containsKey(deviceId);
     }
 
-    public Set<Long> getConnectedDeviceIds() {
-        return Set.copyOf(deviceIdToSessionId.keySet());
-    }
 }
 

@@ -1,8 +1,11 @@
 package com.soil_humidity_api.config;
 
 import com.soil_humidity_api.repository.DeviceRepository;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
@@ -23,7 +26,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic", "/queue");
+        registry.enableSimpleBroker("/topic", "/queue").setHeartbeatValue(new long[]{10000, 10000}).setTaskScheduler(heartbeatScheduler());
         registry.setApplicationDestinationPrefixes("/app");
+    }
+
+    @Bean
+    public TaskScheduler heartbeatScheduler() {
+        return new ThreadPoolTaskScheduler();
     }
 }
