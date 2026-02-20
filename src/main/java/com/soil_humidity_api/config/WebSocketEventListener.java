@@ -1,5 +1,7 @@
 package com.soil_humidity_api.config;
 
+import com.soil_humidity_api.entity.Device;
+import com.soil_humidity_api.repository.DeviceRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -14,18 +16,36 @@ import java.util.Map;
 public class WebSocketEventListener {
 
     private final DeviceSessionRegistry registry;
+    private final DeviceRepository deviceRepository;
 
     @EventListener
     public void handleSessionConnected(SessionConnectedEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         Map<String, Object> attrs = accessor.getSessionAttributes();
-        System.out.println("✅✅✅Connection reached endpoint");
-        if (attrs != null && attrs.get("deviceId") != null) {
-            String sessionId = accessor.getSessionId();
-            Long deviceId = Long.valueOf(attrs.get("deviceId").toString());
 
-            registry.register(sessionId, deviceId);
-            System.out.println("✅ SUCCESS: Device " + deviceId + " is now ONLINE.");
+        Long deviceId = null;
+
+        // Plan A: Check Session Attributes (from Interceptor)
+        if (attrs != null && attrs.get("deviceId") != null) {
+            deviceId = Long.valueOf(attrs.get("deviceId").toString());
+        }
+        // Plan B: Check STOMP Headers (from the CONNECT frame)
+        else {
+            String apiKey = accessor.getFirstNativeHeader("X-API-KEY");
+            if (apiKey != null) {
+                // You'll need to inject your repository here if not already available
+                deviceId = deviceRepository.findByApiKey(apiKey)
+                        .map(Device::getId)
+                        .orElse(null);
+            }
+        }
+
+        if (deviceId != null) {
+            registry.register(accessor.getSessionId(), deviceId);
+            System.out.println("✅ SUCCESS: Device " + deviceId + " registered via " +
+                    (attrs != null && attrs.get("deviceId") != null ? "Attributes" : "STOMP Header"));
+        } else {
+            System.out.println("❌ FAILED: No Device ID found in Attributes or STOMP Headers");
         }
     }
 
