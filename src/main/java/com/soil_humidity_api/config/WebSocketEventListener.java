@@ -31,7 +31,7 @@ public class WebSocketEventListener {
         }
         // Plan B: Check STOMP Headers (from the CONNECT frame)
         else {
-            Object header = accessor.getHeader("X-API-KEY");
+            Object header = accessor.getNativeHeader("X-API-KEY");
             String apiKey = null;
             if (header != null) {
                 apiKey = header.toString();
