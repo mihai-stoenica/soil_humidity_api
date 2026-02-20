@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionConnectEvent;
+import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.Map;
@@ -16,33 +16,24 @@ public class WebSocketEventListener {
     private final DeviceSessionRegistry registry;
 
     @EventListener
-    public void handleSessionConnect(SessionConnectEvent event) {
+    public void handleSessionConnected(SessionConnectedEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         Map<String, Object> attrs = accessor.getSessionAttributes();
 
         if (attrs != null && attrs.get("deviceId") != null) {
-            try {
-                Long deviceId = Long.valueOf(attrs.get("deviceId").toString());
-                String sessionId = accessor.getSessionId();
+            String sessionId = accessor.getSessionId();
+            Long deviceId = Long.valueOf(attrs.get("deviceId").toString());
 
-                registry.register(sessionId, deviceId);
-                System.out.println("✅ REAL DEVICE REGISTERED: " + deviceId);
-            } catch (Exception e) {
-                System.out.println("⚠️ Found deviceId but could not parse: " + attrs.get("deviceId"));
-            }
-        } else {
-            // This is where your Phantom/Probes end up
-            System.out.println("👻 Ignoring Phantom/Anonymous Connection: " + accessor.getSessionId());
+            registry.register(sessionId, deviceId);
+            System.out.println("✅ SUCCESS: Device " + deviceId + " is now ONLINE.");
         }
     }
 
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        String sessionId = accessor.getSessionId();
-
-        registry.unregister(sessionId);
-        System.out.println("Unregistered Session: " + sessionId);
+        // This will now fire ~20s after you unplug the ESP thanks to heartbeats
+        registry.unregister(event.getSessionId());
+        System.out.println("❌ DISCONNECT: Session " + event.getSessionId() + " removed.");
     }
 }
 
