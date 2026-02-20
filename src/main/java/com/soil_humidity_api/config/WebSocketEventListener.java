@@ -4,10 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-import org.springframework.web.socket.messaging.AbstractSubProtocolEvent;
 
 import java.util.Map;
 
@@ -18,20 +16,23 @@ public class WebSocketEventListener {
     private final DeviceSessionRegistry registry;
 
     @EventListener
-    public void handleWebSocketEvent(AbstractSubProtocolEvent event) {
+    public void handleSessionConnected(SessionConnectedEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        String sessionId = accessor.getSessionId();
+        Map<String, Object> attrs = accessor.getSessionAttributes();
 
-        // Check what type of event this actually is
-        System.out.println("Event Received: " + event.getClass().getSimpleName() + " | Session: " + sessionId);
-
-        if (event instanceof SessionConnectedEvent || event instanceof SessionConnectEvent) {
-            Map<String, Object> attrs = accessor.getSessionAttributes();
-            if (attrs != null && attrs.containsKey("deviceId")) {
+        if (attrs != null && attrs.get("deviceId") != null) {
+            try {
                 Long deviceId = Long.valueOf(attrs.get("deviceId").toString());
+                String sessionId = accessor.getSessionId();
+
                 registry.register(sessionId, deviceId);
-                System.out.println("REGISTRY SUCCESS: " + deviceId);
+                System.out.println("✅ REAL DEVICE REGISTERED: " + deviceId);
+            } catch (Exception e) {
+                System.out.println("⚠️ Found deviceId but could not parse: " + attrs.get("deviceId"));
             }
+        } else {
+            // This is where your Phantom/Probes end up
+            System.out.println("👻 Ignoring Phantom/Anonymous Connection: " + accessor.getSessionId());
         }
     }
 
