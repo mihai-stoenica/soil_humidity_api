@@ -19,7 +19,7 @@ public class WebSocketEventListener {
     public void handleSessionConnected(SessionConnectedEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         Map<String, Object> attrs = accessor.getSessionAttributes();
-
+        System.out.println("✅✅✅Connection reached endpoint");
         if (attrs != null && attrs.get("deviceId") != null) {
             String sessionId = accessor.getSessionId();
             Long deviceId = Long.valueOf(attrs.get("deviceId").toString());
