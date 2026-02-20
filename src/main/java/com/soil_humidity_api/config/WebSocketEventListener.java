@@ -26,7 +26,9 @@ public class WebSocketEventListener {
             Long deviceId = (Long) attrs.get("deviceId");
 
             registry.register(sessionId,deviceId);
+            System.out.println("Device registered: " + sessionId + " " + deviceId);
         }
+
     }
 
     @EventListener
