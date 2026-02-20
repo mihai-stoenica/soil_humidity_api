@@ -31,7 +31,12 @@ public class WebSocketEventListener {
         }
         // Plan B: Check STOMP Headers (from the CONNECT frame)
         else {
-            String apiKey = accessor.getFirstNativeHeader("X-API-KEY");
+            Object header = accessor.getHeader("X-API-KEY");
+            String apiKey = null;
+            if (header != null) {
+                apiKey = header.toString();
+            }
+
             if (apiKey != null) {
                 // You'll need to inject your repository here if not already available
                 deviceId = deviceRepository.findByApiKey(apiKey)
