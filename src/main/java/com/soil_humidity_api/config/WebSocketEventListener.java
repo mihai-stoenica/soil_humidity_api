@@ -24,7 +24,7 @@ public class WebSocketEventListener {
         if (attrs == null) return;
 
         String sessionId = accessor.getSessionId();
-        Long deviceId = (Long) attrs.get("deviceId");
+        Long deviceId = (Long) attrs.get("deviceId") ;
 
         if (deviceId != null) {
             registry.register(sessionId, deviceId);
@@ -41,4 +41,5 @@ public class WebSocketEventListener {
         System.out.println("Unregistered Session: " + sessionId);
     }
 }
+
 

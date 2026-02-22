@@ -50,7 +50,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDto loginRequest) {
-
+        System.out.println("login");
         Optional<User> existingUser = userRepository.findByEmail(loginRequest.email());
 
         if(existingUser.isEmpty() || !passwordEncoder.matches(loginRequest.password(), existingUser.get().getPassword())) {
