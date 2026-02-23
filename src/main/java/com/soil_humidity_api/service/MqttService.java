@@ -3,6 +3,7 @@ package com.soil_humidity_api.service;
 import com.soil_humidity_api.dto.ws.SensorDataDto;
 import com.soil_humidity_api.entity.Device;
 import com.soil_humidity_api.repository.DeviceRepository;
+import jakarta.annotation.PostConstruct;
 import org.eclipse.paho.client.mqttv3.*;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,68 +17,107 @@ public class MqttService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final DeviceRepository deviceRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final IMqttClient mqttClient;
+    private final DeviceStatusService deviceStatusService;
+    private final MqttConnectOptions options;
 
     public MqttService(
             IMqttClient mqttClient,
             DeviceRepository deviceRepository,
-            SimpMessagingTemplate messagingTemplate
+            SimpMessagingTemplate messagingTemplate,
+            DeviceStatusService deviceStatusService,
+            MqttConnectOptions options
     ) throws MqttException {
+        this.mqttClient = mqttClient;
         this.deviceRepository = deviceRepository;
         this.messagingTemplate = messagingTemplate;
+        this.deviceStatusService = deviceStatusService;
+        this.options = options;
+    }
 
-        mqttClient.setCallback(new MqttCallback()
-        {
-            @Override public void connectionLost(Throwable cause) {
+    @PostConstruct
+    public void init() {
+        setupCallback();
+        connectAndSubscribe();
+    }
+
+    private void setupCallback() {
+        mqttClient.setCallback(new MqttCallback() {
+
+            @Override
+            public void connectionLost(Throwable cause) {
                 System.out.println("Connection to MQTT broker lost!");
             }
 
-            @Override public void messageArrived(String topic, MqttMessage message) {
-                try {
-                    String payload = new String(message.getPayload());
+            @Override
+            public void messageArrived(String topic, MqttMessage message) {
+                String payload = new String(message.getPayload());
 
-                    SensorDataDto data = objectMapper.readValue(payload, SensorDataDto.class);
-
-                    System.out.println("Humidity: " + data.humidity());
-                    System.out.println("Temp: " + data.temperature());
-
-                    handleSensorData(topic, data);
-
-                } catch (Exception e) {
-                    System.err.println("Invalid MQTT payload: " + e.getMessage());
+                if (topic.endsWith("/telemetry")) {
+                    handleTelemetry(topic, payload);
+                } else if (topic.endsWith("/status")) {
+                    deviceStatusService.handleStatusUpdate(topic, payload);
                 }
             }
 
-            @Override public void deliveryComplete(IMqttDeliveryToken token)
-            {  }
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {}
         });
-        mqttClient.subscribe("soil/device/+/telemetry"); }
+    }
 
+    public void connectAndSubscribe() {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    if (!mqttClient.isConnected()) {
+                        mqttClient.connect(options);
+                    }
+
+                    mqttClient.subscribe("soil/device/+/telemetry");
+                    mqttClient.subscribe("soil/device/+/status");
+
+                    break;
+                } catch (Exception e) {
+                    System.out.println("MQTT not ready. Retrying in 5s...");
+                   try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ignored) {}
+                }
+            }
+        }).start();
+    }
+
+    private void handleTelemetry(String topic, String payload) {
+        try {
+            SensorDataDto data = objectMapper.readValue(payload, SensorDataDto.class);
+
+            System.out.println("Humidity: " + data.humidity());
+            System.out.println("Temp: " + data.temperature());
+
+            handleSensorData(topic, data);
+
+        } catch (Exception e) {
+            System.err.println("Invalid MQTT payload: " + e.getMessage());
+        }
+    }
 
     private void handleSensorData(String topic, SensorDataDto payload) {
         String[] parts = topic.split("/");
 
         if (parts.length > 2) {
-            String deviceIdStr = parts[2];
+            String deviceKey = parts[2];
 
-            try {
-                Long deviceId = Long.parseLong(deviceIdStr);
+            Optional<Device> optionalDevice = deviceRepository.findByApiKey(deviceKey);
 
-                Optional<Device> optionalDevice = deviceRepository.findById(deviceId);
+            optionalDevice.ifPresent(device -> {
+                device.setLastHumidity(payload.humidity());
+                device.setLastTemperature(payload.temperature());
+                device.setLastSeen(Instant.now());
 
-                optionalDevice.ifPresent(device -> {
-                    device.setLastHumidity(payload.humidity());
-                    device.setLastTemperature(payload.temperature());
-                    device.setLastSeen(Instant.now());
+                deviceRepository.save(device);
 
-                    deviceRepository.save(device);
-                });
-
-                messagingTemplate.convertAndSend("/topic/device/" + deviceIdStr, payload);
-
-            } catch (NumberFormatException e) {
-                System.out.println("Error while parsing number");
-            }
-
+                messagingTemplate.convertAndSend("/topic/device/" + device.getId().toString(), payload);
+            });
         }
     }
 }

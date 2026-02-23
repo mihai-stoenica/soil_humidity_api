@@ -28,6 +28,12 @@ public class Device {
     @Column(unique = true)
     private String apiKey;
 
+    @NonNull
+    private String secret;
+
+    @Column(nullable = false)
+    private boolean connected = false;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

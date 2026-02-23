@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soil_humidity_api.dto.ws.ContinuousSensorCommandDto;
 import com.soil_humidity_api.dto.ws.StepSensorCommandDto;
 import com.soil_humidity_api.dto.ws.UserDataDto;
-import com.soil_humidity_api.entity.Device;
 import com.soil_humidity_api.entity.Preset;
 import com.soil_humidity_api.enums.Pattern;
 import com.soil_humidity_api.mapper.ContinuousCommandMapper;
@@ -20,7 +19,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -42,49 +40,42 @@ public class SoilStompController {
             return;
         }
 
-        Optional<Device> deviceOpt = deviceRepository.findById(deviceId);
-        Device device;
-        Preset preset;
-        if(deviceOpt.isPresent()) {
-            device = deviceOpt.get();
+        deviceRepository.findById(deviceId).ifPresent(device -> {
 
             if(!device.getUser().getEmail().equals(email)) {
                 return;
             }
+            Preset preset = device.getActivePreset();
 
-            preset = device.getActivePreset();
-        } else {
-            return;
-        }
+            if(preset.getPattern() == Pattern.CONTINUOUS) {
+                ContinuousSensorCommandDto response = continuousCommandMapper.toDto(preset, payload);
 
-        if(preset.getPattern() == Pattern.CONTINUOUS) {
-            ContinuousSensorCommandDto response = continuousCommandMapper.toDto(preset, payload);
+                try {
+                    String json = objectMapper.writeValueAsString(response);
 
-            try {
-                String json = objectMapper.writeValueAsString(response);
-                client.publish(
-                        "topic/user/" + device.getApiKey(),
-                        new MqttMessage(json.getBytes())
-                );
-            } catch (Exception e) {
-               System.out.println("Error while sending the command.");
+                    client.publish(
+                            "soil/device/" + device.getApiKey() + "/command",
+                            new MqttMessage(json.getBytes())
+                    );
+                } catch (Exception e) {
+                    System.out.println("Error while sending the command.");
+                }
+
+            } else if(preset.getPattern() == Pattern.STEP) {
+                StepSensorCommandDto response = stepCommandMapper.toDto(preset, payload);
+
+                try {
+                    String json = objectMapper.writeValueAsString(response);
+
+                    client.publish(
+                            "soil/device/" + device.getApiKey() + "/command",
+                            new MqttMessage(json.getBytes())
+                    );
+                } catch (Exception e) {
+                    System.out.println("Error while sending the command.");
+                }
             }
-
-        } else if(preset.getPattern() == Pattern.STEP) {
-            StepSensorCommandDto response = stepCommandMapper.toDto(preset, payload);
-
-            try {
-                String json = objectMapper.writeValueAsString(response);
-                client.publish(
-                        "topic/user/" + device.getApiKey(),
-                        new MqttMessage(json.getBytes())
-                );
-            } catch (Exception e) {
-                System.out.println("Error while sending the command.");
-            }
-        }
-
-
+        });
 
     }
 }

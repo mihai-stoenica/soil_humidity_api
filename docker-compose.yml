@@ -11,9 +11,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      MQTT_USER: ${MQTT_USER}
+      MQTT_PWD: ${MQTT_PASS}
     depends_on:
       db:
         condition: service_healthy
+
   nginx:
     image: nginx:latest
     ports:
@@ -43,17 +46,21 @@ services:
       retries: 5
       start_period: 30s
 
-  mqtt:
-    image: eclipse-mosquitto:latest
-    container_name: mqtt_broker
+  emqx:
+    image: emqx/emqx:latest
+    container_name: emqx
     ports:
       - "1883:1883"
-      - "9001:9001"
+      - "18083:18083"
+    environment:
+      - MQTT_USER=${MQTT_USER}
+      - MQTT_PWD=${MQTT_PASS}
     volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
+      - emqx-data:/opt/emqx/data
+      - emqx-log:/opt/emqx/log
     restart: always
 
 volumes:
   db-data:
+  emqx-data:
+  emqx-log:

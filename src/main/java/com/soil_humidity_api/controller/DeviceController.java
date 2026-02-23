@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class DeviceController {
     private final DeviceRepository deviceRepository;
     private final UserRepository userRepository;
     private final DeviceMapper deviceMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/claim")
     public ResponseEntity<?> claimDevice(@Valid @RequestBody DeviceClaimDto request) {
@@ -39,7 +41,11 @@ public class DeviceController {
         }
 
         Preset preset = new Preset(request.watering_time());
-        Device device = new Device(request.name(), request.apiKey());
+
+        String hashedSecret = passwordEncoder.encode(request.secret());
+        assert hashedSecret != null;
+
+        Device device = new Device(request.name(), request.apiKey(), hashedSecret);
         preset.setDevice(device);
         device.setUser(user);
         device.addPreset(preset);
