@@ -23,8 +23,6 @@ public class DeviceStatusService {
                 device.setLastSeen(Instant.now());
 
                 deviceRepository.save(device);
-
-                System.out.println("Device " + deviceKey + " is now " + status);
             });
         } catch (Exception e) {
             System.err.println("Error processing status: " + e.getMessage());

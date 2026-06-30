@@ -47,6 +47,7 @@ public class MqttService {
             @Override
             public void connectionLost(Throwable cause) {
                 System.out.println("Connection to MQTT broker lost!");
+                connectAndSubscribe();
             }
 
             @Override

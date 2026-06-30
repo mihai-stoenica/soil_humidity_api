@@ -16,6 +16,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      emqx:
+        condition: service_healthy
 
   nginx:
     image: nginx:latest
@@ -58,6 +60,11 @@ services:
     volumes:
       - emqx-data:/opt/emqx/data
       - emqx-log:/opt/emqx/log
+    healthcheck:
+      test: [ "CMD", "/opt/emqx/bin/emqx", "ctl", "status" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: always
 
 volumes:

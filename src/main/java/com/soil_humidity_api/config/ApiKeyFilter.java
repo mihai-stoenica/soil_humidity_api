@@ -31,7 +31,6 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         String apiKey = request.getHeader("X-API-KEY");
         String rawSecret = request.getHeader("X-SECRET");
 
-
         if (apiKey != null && rawSecret != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             deviceRepository.findByApiKey(apiKey).ifPresent(device -> {
                 if (passwordEncoder.matches(rawSecret, device.getSecret())) {

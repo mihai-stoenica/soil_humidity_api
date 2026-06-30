@@ -9,8 +9,6 @@ import com.soil_humidity_api.repository.UserRepository;
 import com.soil_humidity_api.service.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,33 +56,12 @@ public class AuthController {
 
         String token = jwtService.generateToken(existingUser.get().getEmail());
 
-        ResponseCookie cookie = ResponseCookie.from("accessToken", token)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(6*60*60)
-                .sameSite("Lax")
-                .build();
-
         UserDto response = userMapper.toDto(existingUser.get());
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(response);
+        return ResponseEntity.ok(Map.of(
+                "accessToken", token,
+                "user", response
+        ));
     }
 
-    @PostMapping("/logout")
-    public  ResponseEntity<?> logout() {
-        ResponseCookie cleanCookie = ResponseCookie.from("accessToken", "")
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(0)
-                .sameSite("Lax")
-                .build();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cleanCookie.toString())
-                .body(Map.of("message","You have been logged out."));
-    }
 }
