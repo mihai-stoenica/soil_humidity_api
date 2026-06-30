@@ -74,8 +74,8 @@ public class MqttService {
                         mqttClient.connect(options);
                     }
 
-                    mqttClient.subscribe("soil/device/+/telemetry");
-                    mqttClient.subscribe("soil/device/+/status");
+                    mqttClient.subscribe("soil/device/+/telemetry", 1);
+                    mqttClient.subscribe("soil/device/+/status", 1);
 
                     break;
                 } catch (Exception e) {
