@@ -7,6 +7,7 @@ public record StepPresetDtoRes (
     Integer watering_time,
     Pattern pattern,
     Integer steps,
-    Integer delay
+    Integer delay,
+    String name
 
 ) implements PresetResponse {}

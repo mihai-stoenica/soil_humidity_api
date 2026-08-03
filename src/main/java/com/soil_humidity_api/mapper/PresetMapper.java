@@ -16,14 +16,16 @@ public class PresetMapper {
                     preset.getWatering_time(),
                     preset.getPattern(),
                     preset.getSteps(),
-                    preset.getDelay()
+                    preset.getDelay(),
+                    preset.getName()
             );
         }
 
         return new ContinuousPresetDtoRes(
                 preset.getId(),
                 preset.getWatering_time(),
-                preset.getPattern()
+                preset.getPattern(),
+                preset.getName()
         );
     }
 }

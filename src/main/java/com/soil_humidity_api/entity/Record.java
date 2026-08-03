@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Humidity {
+public class Record {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,17 @@ public class Humidity {
     @NotNull
     @Min(value = 0)
     @Max(value = 100)
-    private Integer value;
+    private Integer humidity;
+
+    @NotNull
+    @Min(value = -20)
+    @Max(value = 50)
+    private Float temperature;
+
+    @NotNull
+    @Min(value = 0)
+    @Max(value = 100)
+    private Float light_level;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

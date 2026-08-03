@@ -2,8 +2,8 @@ package com.soil_humidity_api.dto.response;
 
 import java.util.List;
 
-public record HumidityResponseDto(
-        List<SingleHumidityResponseDto> records,
+public record RecordResponseDto(
+        List<SingleRecordResponseDto> records,
         Integer totalPages
 ) {
 }

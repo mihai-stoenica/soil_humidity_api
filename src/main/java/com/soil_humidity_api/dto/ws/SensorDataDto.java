@@ -11,6 +11,13 @@ public record SensorDataDto(
         Integer humidity,
 
         @NotNull
-        Float temperature
+        @Min(value = -20)
+        @Max(value = 50)
+        Float temperature,
+
+        @NotNull
+        @Min(value = 0)
+        @Max(value = 100)
+        Float light_level
 ){
 }

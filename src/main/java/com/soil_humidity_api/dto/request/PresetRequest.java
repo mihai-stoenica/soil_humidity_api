@@ -17,4 +17,5 @@ import com.soil_humidity_api.enums.Pattern;
 public sealed interface PresetRequest permits ContinuousPresetDto, StepPresetDto {
     Integer watering_time();
     Pattern pattern();
+    String name();
 }

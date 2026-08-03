@@ -35,6 +35,7 @@ public class PresetController {
 
         Preset preset = new Preset();
 
+        preset.setName(request.name());
         preset.setWatering_time(request.watering_time());
         preset.setPattern(request.pattern());
 

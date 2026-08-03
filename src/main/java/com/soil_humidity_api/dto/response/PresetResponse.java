@@ -18,4 +18,5 @@ public sealed interface PresetResponse permits ContinuousPresetDtoRes, StepPrese
     Long id();
     Integer watering_time();
     Pattern pattern();
+    String name();
 }

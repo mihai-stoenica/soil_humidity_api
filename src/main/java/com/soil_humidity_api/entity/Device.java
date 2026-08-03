@@ -56,8 +56,14 @@ public class Device {
 
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL)
     @NotNull
-    private List<Humidity> humidities = new ArrayList<>();
+    private List<Record> humidities = new ArrayList<>();
 
+    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<WateringEvent> wateringEvents = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id", nullable = false)
+    private Location location;
 
     public void addPreset(Preset preset) {
         presets.add(preset);

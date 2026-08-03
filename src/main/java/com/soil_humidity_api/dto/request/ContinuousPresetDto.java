@@ -10,6 +10,9 @@ public record ContinuousPresetDto(
         Integer watering_time,
 
         @NotNull
-        Pattern pattern
+        Pattern pattern,
+
+        @NotNull
+        String name
 )  implements PresetRequest {
 }

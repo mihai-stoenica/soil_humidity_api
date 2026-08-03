@@ -1,15 +1,15 @@
 package com.soil_humidity_api.controller;
 
-import com.soil_humidity_api.dto.request.HumidityRequestDto;
-import com.soil_humidity_api.dto.response.HumidityResponseDto;
-import com.soil_humidity_api.dto.response.SingleHumidityResponseDto;
+import com.soil_humidity_api.dto.request.RecordRequestDto;
+import com.soil_humidity_api.dto.response.RecordResponseDto;
+import com.soil_humidity_api.dto.response.SingleRecordResponseDto;
 import com.soil_humidity_api.entity.Device;
-import com.soil_humidity_api.entity.Humidity;
-import com.soil_humidity_api.mapper.HumidityRecordMapper;
-import com.soil_humidity_api.mapper.SingleHumidityRecordMapper;
+import com.soil_humidity_api.entity.Record;
+import com.soil_humidity_api.mapper.RecordMapper;
+import com.soil_humidity_api.mapper.SingleRecordMapper;
 import com.soil_humidity_api.repository.DeviceRepository;
 import com.soil_humidity_api.repository.HumidityRepository;
-import com.soil_humidity_api.service.HumidityService;
+import com.soil_humidity_api.service.RecordService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,13 +25,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class HumidityController {
     private final HumidityRepository humidityRepository;
-    private final HumidityService humidityService;
+    private final RecordService recordService;
     private final DeviceRepository deviceRepository;
-    private final SingleHumidityRecordMapper singleHumidityRecordMapper;
-    private final HumidityRecordMapper humidityRecordMapper;
+    private final SingleRecordMapper singleRecordMapper;
+    private final RecordMapper recordMapper;
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestBody HumidityRequestDto request, HttpServletRequest r) {
+    public ResponseEntity<?> save(@RequestBody RecordRequestDto request, HttpServletRequest r) {
         String apiKey = r.getHeader("X-API-KEY");
 
         Optional<Device> optionalDevice = deviceRepository.findByApiKey(apiKey);
@@ -41,14 +41,16 @@ public class HumidityController {
         }
         Device device = optionalDevice.get();
 
-        Humidity humidity = new Humidity();
+        Record record = new Record();
 
-        humidity.setDevice(device);
-        humidity.setValue(request.value());
+        record.setDevice(device);
+        record.setHumidity(request.humidity());
+        record.setTemperature(request.temperature());
+        record.setLight_level(request.light_level());
 
-        humidityRepository.save(humidity);
+        humidityRepository.save(record);
 
-        SingleHumidityResponseDto response = singleHumidityRecordMapper.toDto(humidity);
+        SingleRecordResponseDto response = singleRecordMapper.toDto(record);
 
         return ResponseEntity.ok().body(response);
     }
@@ -63,14 +65,14 @@ public class HumidityController {
         if(device == null) {
             return ResponseEntity.notFound().build();
         }
-        Page<Humidity> resultPage = humidityService.getHumidityData(device, page, size);
+        Page<Record> resultPage = recordService.getHumidityData(device, page, size);
 
-        List<SingleHumidityResponseDto> records = resultPage.getContent()
+        List<SingleRecordResponseDto> records = resultPage.getContent()
                 .stream()
-                .map(singleHumidityRecordMapper::toDto)
+                .map(singleRecordMapper::toDto)
                 .toList();
 
-        HumidityResponseDto response = humidityRecordMapper.toDto(records, resultPage.getTotalPages());
+        RecordResponseDto response = recordMapper.toDto(records, resultPage.getTotalPages());
 
         return ResponseEntity.ok(response);
     }

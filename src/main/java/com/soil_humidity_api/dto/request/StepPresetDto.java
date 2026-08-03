@@ -13,6 +13,9 @@ public record StepPresetDto(
         Pattern pattern,
 
         @NotNull
+        String name,
+
+        @NotNull
         @Min(value = 1, message = "The number of steps must be greater than 0.")
         Integer steps,
 

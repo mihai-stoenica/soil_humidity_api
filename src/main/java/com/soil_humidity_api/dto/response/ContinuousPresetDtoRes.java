@@ -6,5 +6,6 @@ public record ContinuousPresetDtoRes
 (
     Long id,
     Integer watering_time,
-    Pattern pattern
+    Pattern pattern,
+    String name
 ) implements PresetResponse{ }
