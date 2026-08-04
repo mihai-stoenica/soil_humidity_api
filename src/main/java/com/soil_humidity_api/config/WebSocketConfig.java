@@ -48,20 +48,25 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 StompHeaderAccessor accessor =
                         MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-                assert accessor != null;
-                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+                if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
                     String authHeader = accessor.getFirstNativeHeader("Authorization");
 
                     if (authHeader != null && authHeader.startsWith("Bearer ")) {
                         String token = authHeader.substring(7);
-                        String username = jwtService.extractUsername(token);
 
-                        if (jwtService.isTokenValid(token)) {
-                            UserDetails user = userDetailsService.loadUserByUsername(username);
-                            UsernamePasswordAuthenticationToken auth =
-                                    new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                        try {
+                            String username = jwtService.extractUsername(token);
 
-                            accessor.setUser(auth);
+                            if (username != null && jwtService.isTokenValid(token)) {
+                                UserDetails user = userDetailsService.loadUserByUsername(username);
+                                UsernamePasswordAuthenticationToken auth =
+                                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
+                                accessor.setUser(auth);
+                            }
+                        } catch (Exception e) {
+                            System.err.println("WebSocket JWT Authentication failed: " + e.getMessage());
+
                         }
                     }
                 }
