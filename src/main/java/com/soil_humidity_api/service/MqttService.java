@@ -94,6 +94,7 @@ public class MqttService {
 
             System.out.println("Humidity: " + data.humidity());
             System.out.println("Temp: " + data.temperature());
+            System.out.println("Light: " + data.light_level());
 
             handleSensorData(topic, data);
 
